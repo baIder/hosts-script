@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import { ref } from "vue";
 import HostsTable from "@/components/HostsTable.vue";
-import { handleText } from "@/utils/helper";
+import { useStore } from "@/stores";
 
-const raw_data = ref<string[][]>();
+const store = useStore();
+
 const onOpenFile = async () => {
     const [fileHandler] = await window.showOpenFilePicker();
     const text = await (await fileHandler.getFile()).text();
-    raw_data.value = handleText(text);
+    store.handleText(text);
 };
 
 const onSaveFile = async () => {
@@ -25,7 +25,7 @@ const onSaveFile = async () => {
             <a-button @click="onSaveFile"> 保存文件 </a-button>
         </header>
         <main>
-            <HostsTable v-model="raw_data" />
+            <HostsTable />
         </main>
     </div>
 </template>
