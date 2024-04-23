@@ -2,6 +2,7 @@
 import { $genScript } from "@/apis";
 import HostsTable from "@/components/HostsTable.vue";
 import { useStore } from "@/stores";
+import { genBatScript } from "@/utils/bat-script";
 
 const store = useStore();
 
@@ -14,11 +15,22 @@ const onOpenFile = async () => {
 const onSaveFile = async () => {
     const { data: file } = await $genScript(store.hostsData);
     const fileHandle = await window.showSaveFilePicker({
-        suggestedName: "script.zip",
+        suggestedName: "update-hosts.zip",
         types: [{ accept: { "application/zip": [".zip"] } }]
     });
     const writable = await fileHandle.createWritable();
     await writable.write(file);
+    await writable.close();
+};
+
+const onSaveBat = async () => {
+    const script = genBatScript(store.hostsData);
+    const fileHandle = await window.showSaveFilePicker({
+        suggestedName: "update-hosts.bat",
+        types: [{ accept: { "text/plain": [".bat"] } }]
+    });
+    const writable = await fileHandle.createWritable();
+    await writable.write(script);
     await writable.close();
 };
 </script>
@@ -28,6 +40,7 @@ const onSaveFile = async () => {
         <header>
             <a-button @click="onOpenFile"> 选择文件 </a-button>
             <a-button @click="onSaveFile"> 保存文件 </a-button>
+            <a-button @click="onSaveBat"> 保存bat脚本 </a-button>
         </header>
         <main>
             <HostsTable />
