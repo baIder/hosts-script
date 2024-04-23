@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { $genScript } from "@/apis";
 import HostsTable from "@/components/HostsTable.vue";
 import { useStore } from "@/stores";
 
@@ -11,10 +12,14 @@ const onOpenFile = async () => {
 };
 
 const onSaveFile = async () => {
-    // const fileHandle = await window.showSaveFilePicker();
-    // const writable = await fileHandle.createWritable();
-    // await writable.write(content.value);
-    // await writable.close();
+    const { data: file } = await $genScript(store.hostsData);
+    const fileHandle = await window.showSaveFilePicker({
+        suggestedName: "script.zip",
+        types: [{ accept: { "application/zip": [".zip"] } }]
+    });
+    const writable = await fileHandle.createWritable();
+    await writable.write(file);
+    await writable.close();
 };
 </script>
 
