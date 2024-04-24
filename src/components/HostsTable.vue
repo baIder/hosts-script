@@ -31,11 +31,22 @@ const onEdit = (uuid: string) => {
 
 const onSave = (uuid: string) => {
     Object.assign(store.hostsData.filter((item) => uuid === item.uuid)[0], editableData[uuid]);
+    if (editableData[uuid].ip === "" && editableData[uuid].domain === "") {
+        store.deleteRow(uuid);
+    }
     Reflect.deleteProperty(editableData, uuid);
 };
 
 const onCancel = (uuid: string) => {
+    if (editableData[uuid].ip === "" && editableData[uuid].domain === "") {
+        store.deleteRow(uuid);
+    }
     Reflect.deleteProperty(editableData, uuid);
+};
+
+const onAddHostRow = () => {
+    const newRow = store.addRow();
+    editableData[newRow.uuid] = { ...newRow };
 };
 </script>
 
@@ -101,7 +112,7 @@ const onCancel = (uuid: string) => {
             <a-table-summary>
                 <a-table-summary-row>
                     <a-table-summary-cell :colSpan="3">
-                        <a-button style="width: 100%">新增</a-button>
+                        <a-button style="width: 100%" @click="onAddHostRow">新增</a-button>
                     </a-table-summary-cell>
                 </a-table-summary-row>
             </a-table-summary>

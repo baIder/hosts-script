@@ -52,5 +52,10 @@ export const useStore = defineStore("index", () => {
         hostsData.value = hostsData.value.filter((row) => row.uuid !== uuid);
     };
 
-    return { handleText, hostsData, deleteRow, isWindows, needCompact };
+    const addRow = () => {
+        hostsData.value.push({ uuid: genUUID(), ip: "", domain: "" });
+        return hostsData.value[hostsData.value.length - 1];
+    };
+
+    return { handleText, hostsData, deleteRow, isWindows, needCompact, addRow };
 });
