@@ -3,6 +3,8 @@ import { defineStore } from "pinia";
 import { v4 as genUUID } from "uuid";
 
 export const useStore = defineStore("index", () => {
+    const isWindows = ref(false);
+    const needCompact = ref(false);
     const rawStr = ref("");
     const hostsData = ref<Hosts[]>([]);
 
@@ -10,7 +12,8 @@ export const useStore = defineStore("index", () => {
         rawStr.value = str;
 
         const rows = str
-            .split("\n")
+            .split(isWindows.value ? "\r\n" : "\n")
+            .map((row) => row.trim())
             .filter((row) => row.length > 0)
             .filter((row) => !row.startsWith("#"))
             .map((row) => row.split(/\t|\s+/));
@@ -49,5 +52,5 @@ export const useStore = defineStore("index", () => {
         hostsData.value = hostsData.value.filter((row) => row.uuid !== uuid);
     };
 
-    return { handleText, hostsData, deleteRow };
+    return { handleText, hostsData, deleteRow, isWindows, needCompact };
 });

@@ -3,17 +3,44 @@ import { $genScript } from "@/apis";
 import HostsTable from "@/components/HostsTable.vue";
 import { useStore } from "@/stores";
 import { genBatScript } from "@/utils/bat-script";
+import { onMounted } from "vue";
 
 const store = useStore();
 
 const onOpenFile = async () => {
-    const [fileHandler] = await window.showOpenFilePicker();
-    const text = await (await fileHandler.getFile()).text();
-    store.handleText(text);
+    if (store.needCompact) {
+        const input = document.createElement("input");
+        input.type = "file";
+        input.onchange = async (e) => {
+            const file = (e.target as HTMLInputElement).files?.[0];
+            if (!file) return;
+            const text = await file.text();
+            store.handleText(text);
+        };
+        input.click();
+    } else {
+        const [fileHandler] = await window.showOpenFilePicker();
+        const text = await (await fileHandler.getFile()).text();
+        store.handleText(text);
+    }
 };
 
 const onSaveFile = async () => {
+    if (store.isWindows) {
+        onSaveBat();
+        return;
+    }
     const { data: file } = await $genScript(store.hostsData);
+    if (store.needCompact) {
+        const blob = new Blob([file], { type: "application/zip" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "update-hosts.zip";
+        a.click();
+        URL.revokeObjectURL(url);
+        return;
+    }
     const fileHandle = await window.showSaveFilePicker({
         suggestedName: "update-hosts.zip",
         types: [{ accept: { "application/zip": [".zip"] } }]
@@ -25,6 +52,16 @@ const onSaveFile = async () => {
 
 const onSaveBat = async () => {
     const script = genBatScript(store.hostsData);
+    if (store.needCompact) {
+        const blob = new Blob([script], { type: "text/plain" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "update-hosts.bat";
+        a.click();
+        URL.revokeObjectURL(url);
+        return;
+    }
     const fileHandle = await window.showSaveFilePicker({
         suggestedName: "update-hosts.bat",
         types: [{ accept: { "text/plain": [".bat"] } }]
@@ -33,6 +70,15 @@ const onSaveBat = async () => {
     await writable.write(script);
     await writable.close();
 };
+
+onMounted(() => {
+    if (window.showSaveFilePicker === undefined) {
+        store.needCompact = true;
+    }
+    if (navigator.userAgent.indexOf("Windows") > -1) {
+        store.isWindows = true;
+    }
+});
 </script>
 
 <template>
@@ -40,7 +86,6 @@ const onSaveBat = async () => {
         <header>
             <a-button @click="onOpenFile"> 选择文件 </a-button>
             <a-button @click="onSaveFile"> 保存文件 </a-button>
-            <a-button @click="onSaveBat"> 保存bat脚本 </a-button>
         </header>
         <main>
             <HostsTable />
