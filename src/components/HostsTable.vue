@@ -48,10 +48,15 @@ const onAddHostRow = () => {
     const newRow = store.addRow();
     editableData[newRow.uuid] = { ...newRow };
 };
+
+const onSelectChange = (keys: string[]) => {
+    store.selectedKeys = keys;
+};
 </script>
 
 <template>
     <a-table
+        :row-selection="{ selectedRowKeys: store.selectedKeys, onChange: onSelectChange }"
         :columns="columns"
         :data-source="store.hostsData"
         :pagination="false"
@@ -111,7 +116,7 @@ const onAddHostRow = () => {
         <template #summary>
             <a-table-summary>
                 <a-table-summary-row>
-                    <a-table-summary-cell :colSpan="3">
+                    <a-table-summary-cell :colSpan="4">
                         <a-button style="width: 100%" @click="onAddHostRow">新增</a-button>
                     </a-table-summary-cell>
                 </a-table-summary-row>

@@ -30,7 +30,7 @@ const onSaveFile = async () => {
         onSaveBat();
         return;
     }
-    const { data: file } = await $genScript(store.hostsData);
+    const { data: file } = await $genScript(store.selectedHosts);
     if (store.needCompact) {
         const blob = new Blob([file], { type: "application/zip" });
         const url = URL.createObjectURL(blob);
@@ -51,7 +51,7 @@ const onSaveFile = async () => {
 };
 
 const onSaveBat = async () => {
-    const script = genBatScript(store.hostsData);
+    const script = genBatScript(store.selectedHosts);
     if (store.needCompact) {
         const blob = new Blob([script], { type: "text/plain" });
         const url = URL.createObjectURL(blob);
@@ -85,7 +85,7 @@ onMounted(() => {
     <div class="wrapper">
         <header>
             <a-button @click="onOpenFile"> 选择文件 </a-button>
-            <a-button @click="onSaveFile"> 保存文件 </a-button>
+            <a-button @click="onSaveFile"> 导出脚本 </a-button>
         </header>
         <main>
             <HostsTable />

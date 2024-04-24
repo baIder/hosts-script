@@ -1,4 +1,4 @@
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { defineStore } from "pinia";
 import { v4 as genUUID } from "uuid";
 
@@ -7,6 +7,11 @@ export const useStore = defineStore("index", () => {
     const needCompact = ref(false);
     const rawStr = ref("");
     const hostsData = ref<Hosts[]>([]);
+    const selectedKeys = ref<string[]>([]);
+
+    const selectedHosts = computed(() => {
+        return hostsData.value.filter((row) => selectedKeys.value.includes(row.uuid));
+    });
 
     const handleText = (str: string) => {
         rawStr.value = str;
@@ -57,5 +62,14 @@ export const useStore = defineStore("index", () => {
         return hostsData.value[hostsData.value.length - 1];
     };
 
-    return { handleText, hostsData, deleteRow, isWindows, needCompact, addRow };
+    return {
+        handleText,
+        hostsData,
+        deleteRow,
+        isWindows,
+        needCompact,
+        addRow,
+        selectedKeys,
+        selectedHosts
+    };
 });
