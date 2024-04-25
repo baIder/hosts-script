@@ -80,7 +80,7 @@ const onSaveBat = async () => {
 <style scoped lang="scss">
 .platform {
     font-weight: bold;
-    color: red;
+    color: #ff4d4f;
 }
 
 .buttons {

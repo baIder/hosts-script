@@ -4,26 +4,13 @@ import { storeToRefs } from "pinia";
 import { useStore } from "@/stores";
 import HostsTable from "@/components/HostsTable.vue";
 import ExportScriptModal from "@/components/ExportScriptModal.vue";
+import ImportHostsModal from "@/components/ImportHostsModal.vue";
 
 const store = useStore();
 const { currentPlatform } = storeToRefs(store);
 
-const onOpenFile = async () => {
-    if (store.needCompact) {
-        const input = document.createElement("input");
-        input.type = "file";
-        input.onchange = async (e) => {
-            const file = (e.target as HTMLInputElement).files?.[0];
-            if (!file) return;
-            const text = await file.text();
-            store.handleText(text);
-        };
-        input.click();
-    } else {
-        const [fileHandler] = await window.showOpenFilePicker();
-        const text = await (await fileHandler.getFile()).text();
-        store.handleText(text);
-    }
+const openImportModal = () => {
+    store.modalVisible.importModal = true;
 };
 
 const openExportModal = () => {
@@ -49,7 +36,7 @@ onMounted(() => {
 <template>
     <div class="wrapper">
         <header>
-            <a-button @click="onOpenFile"> 从hosts文件中导入 </a-button>
+            <a-button @click="openImportModal"> 从hosts文件中导入 </a-button>
             <a-button @click="openExportModal"> 导出脚本 </a-button>
         </header>
         <main>
@@ -57,6 +44,7 @@ onMounted(() => {
         </main>
     </div>
     <ExportScriptModal />
+    <ImportHostsModal />
 </template>
 
 <style scoped lang="scss">
