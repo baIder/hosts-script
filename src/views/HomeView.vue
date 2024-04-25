@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { $genScript } from "@/apis";
-import HostsTable from "@/components/HostsTable.vue";
-import { useStore } from "@/stores";
-import { genBatScript } from "@/utils/bat-script";
 import { onMounted } from "vue";
+import { storeToRefs } from "pinia";
+import { useStore } from "@/stores";
+import HostsTable from "@/components/HostsTable.vue";
+import ExportScriptModal from "@/components/ExportScriptModal.vue";
 
 const store = useStore();
+const { currentPlatform } = storeToRefs(store);
 
 const onOpenFile = async () => {
     if (store.needCompact) {
@@ -25,50 +26,8 @@ const onOpenFile = async () => {
     }
 };
 
-const onSaveFile = async () => {
-    if (store.isWindows) {
-        onSaveBat();
-        return;
-    }
-    const { data: file } = await $genScript(store.selectedHosts);
-    if (store.needCompact) {
-        const blob = new Blob([file], { type: "application/zip" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "update-hosts.zip";
-        a.click();
-        URL.revokeObjectURL(url);
-        return;
-    }
-    const fileHandle = await window.showSaveFilePicker({
-        suggestedName: "update-hosts.zip",
-        types: [{ accept: { "application/zip": [".zip"] } }]
-    });
-    const writable = await fileHandle.createWritable();
-    await writable.write(file);
-    await writable.close();
-};
-
-const onSaveBat = async () => {
-    const script = genBatScript(store.selectedHosts);
-    if (store.needCompact) {
-        const blob = new Blob([script], { type: "text/plain" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "update-hosts.bat";
-        a.click();
-        URL.revokeObjectURL(url);
-        return;
-    }
-    const fileHandle = await window.showSaveFilePicker({
-        suggestedName: "update-hosts.bat",
-        types: [{ accept: { "text/plain": [".bat"] } }]
-    });
-    const writable = await fileHandle.createWritable();
-    await writable.write(script);
-    await writable.close();
+const openExportModal = () => {
+    store.modalVisible.exportModal = true;
 };
 
 onMounted(() => {
@@ -76,7 +35,13 @@ onMounted(() => {
         store.needCompact = true;
     }
     if (navigator.userAgent.indexOf("Windows") > -1) {
-        store.isWindows = true;
+        currentPlatform.value = "Windows";
+    } else if (navigator.userAgent.indexOf("Mac") > -1) {
+        currentPlatform.value = "MacOS";
+    } else if (navigator.userAgent.indexOf("Linux") > -1) {
+        currentPlatform.value = "Linux";
+    } else {
+        currentPlatform.value = "其他";
     }
 });
 </script>
@@ -84,13 +49,14 @@ onMounted(() => {
 <template>
     <div class="wrapper">
         <header>
-            <a-button @click="onOpenFile"> 选择文件 </a-button>
-            <a-button @click="onSaveFile"> 导出脚本 </a-button>
+            <a-button @click="onOpenFile"> 从hosts文件中导入 </a-button>
+            <a-button @click="openExportModal"> 导出脚本 </a-button>
         </header>
         <main>
             <HostsTable />
         </main>
     </div>
+    <ExportScriptModal />
 </template>
 
 <style scoped lang="scss">

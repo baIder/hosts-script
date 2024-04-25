@@ -1,13 +1,17 @@
-import { computed, ref } from "vue";
+import { computed, reactive, ref } from "vue";
 import { defineStore } from "pinia";
 import { v4 as genUUID } from "uuid";
 
 export const useStore = defineStore("index", () => {
-    const isWindows = ref(false);
+    const currentPlatform = ref<"Windows" | "MacOS" | "Linux" | "其他">("其他");
     const needCompact = ref(false);
     const rawStr = ref("");
     const hostsData = ref<Hosts[]>([]);
     const selectedKeys = ref<string[]>([]);
+    const modalVisible = reactive({
+        exportModal: false,
+        importModal: false
+    });
 
     const selectedHosts = computed(() => {
         return hostsData.value.filter((row) => selectedKeys.value.includes(row.uuid));
@@ -17,7 +21,7 @@ export const useStore = defineStore("index", () => {
         rawStr.value = str;
 
         const rows = str
-            .split(isWindows.value ? "\r\n" : "\n")
+            .split("\n")
             .map((row) => row.trim())
             .filter((row) => row.length > 0)
             .filter((row) => !row.startsWith("#"))
@@ -63,13 +67,15 @@ export const useStore = defineStore("index", () => {
     };
 
     return {
-        handleText,
         hostsData,
-        deleteRow,
-        isWindows,
         needCompact,
-        addRow,
         selectedKeys,
-        selectedHosts
+        selectedHosts,
+        modalVisible,
+        currentPlatform,
+
+        deleteRow,
+        handleText,
+        addRow
     };
 });
