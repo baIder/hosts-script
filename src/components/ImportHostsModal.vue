@@ -1,11 +1,14 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { h, ref } from "vue";
 import { storeToRefs } from "pinia";
+import { message } from "ant-design-vue";
+import { CopyOutlined } from "@ant-design/icons-vue";
 import { useStore } from "@/stores";
 
 const store = useStore();
 const { currentPlatform } = storeToRefs(store);
 const activeKey = ref<string[]>(["1"]);
+const refDivPath = ref<HTMLDivElement>();
 
 const onOpenFile = async () => {
     if (store.needCompact) {
@@ -16,12 +19,49 @@ const onOpenFile = async () => {
             if (!file) return;
             const text = await file.text();
             store.handleText(text);
+            store.modalVisible.importModal = false;
         };
         input.click();
     } else {
-        const [fileHandler] = await window.showOpenFilePicker();
-        const text = await (await fileHandler.getFile()).text();
-        store.handleText(text);
+        try {
+            const [fileHandler] = await window.showOpenFilePicker();
+            const text = await (await fileHandler.getFile()).text();
+            store.handleText(text);
+            store.modalVisible.importModal = false;
+        } catch (e) {
+            const { name, message: errMessage } = e as DOMException;
+            switch (name) {
+                case "NotReadableError":
+                    message.error("文件读取失败，请检查权限");
+                    break;
+
+                case "AbortError":
+                    break;
+
+                default:
+                    message.error(errMessage);
+                    break;
+            }
+        }
+    }
+};
+
+const onCopyPath = async () => {
+    if (!refDivPath.value) return;
+    const text = refDivPath.value.innerText;
+    try {
+        await navigator.clipboard.writeText(text);
+    } catch (err) {
+        const inputElement = document.createElement("input");
+        inputElement.style.position = "fixed";
+        inputElement.style.left = "-10000px";
+        inputElement.style.top = "-10000px";
+        inputElement.style.opacity = "0";
+        inputElement.value = text;
+        document.body.appendChild(inputElement);
+        inputElement.select();
+        document.execCommand("copy");
+        document.body.removeChild(inputElement);
     }
 };
 </script>
@@ -34,7 +74,13 @@ const onOpenFile = async () => {
         <div class="tutorial">在哪里找到 hosts 文件：</div>
         <a-collapse v-model:activeKey="activeKey">
             <a-collapse-panel key="1" header="Windows">
-                <p>Windows</p>
+                <p>点击 选择文件 按钮，将下框中的路径粘贴至打开窗口的路径中，选择打开即可：</p>
+                <div class="copy-path">
+                    <div class="path" ref="refDivPath">%SYSTEMROOT%\System32\drivers\etc\hosts</div>
+                    <a-tooltip title="复制路径">
+                        <a-button :icon="h(CopyOutlined)" size="small" @click="onCopyPath" />
+                    </a-tooltip>
+                </div>
             </a-collapse-panel>
             <a-collapse-panel key="2" header="MacOS">
                 <p>MacOS</p>
@@ -50,6 +96,24 @@ const onOpenFile = async () => {
 </template>
 
 <style scoped lang="scss">
+.copy-path {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1em;
+
+    border: 1px solid #d9d9d9;
+    border-radius: 8px;
+    padding: 8px;
+    background: #f8f8f8;
+
+    .path {
+        flex: 1;
+        overflow: auto hidden;
+        text-wrap: nowrap;
+    }
+}
+
 .platform {
     color: #ff4d4f;
     font-weight: bold;
