@@ -47,7 +47,7 @@ echo     if exist "%%temp%%\\getadmin.vbs" ^( del "%%temp%%\\getadmin.vbs" ^)
 echo     pushd "%%CD%%"
 echo     CD /D "%%~dp0"
 echo :--------------------------------------
-echo copy /y %SYSTEMROOT%\\System32\\drivers\\etc\\hosts.bak C:\\Windows\\System32\\drivers\\etc\\hosts
+echo copy /y %SYSTEMROOT%\\System32\\drivers\\etc\\hosts.bak %SYSTEMROOT%\\System32\\drivers\\etc\\hosts
 echo echo hosts has been recovered.
 echo pause
 ) > recover.bat
