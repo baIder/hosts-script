@@ -6,10 +6,11 @@ import { CopyOutlined } from "@ant-design/icons-vue";
 import { useStore } from "@/stores";
 
 import imgWindows from "@/assets/images/windows.gif";
+import imgMac from "@/assets/images/mac.gif";
 
 const store = useStore();
 const { currentPlatform } = storeToRefs(store);
-const activeKey = ref<string[]>(["1"]);
+const activeKey = ref<string[]>([]);
 const refDivPath = ref<HTMLDivElement>();
 
 const onOpenFile = async () => {
@@ -92,7 +93,25 @@ const onCopyPath = async () => {
                 </p>
             </a-collapse-panel>
             <a-collapse-panel key="2" header="MacOS">
-                <p>MacOS</p>
+                <p>
+                    点击
+                    <b>选择文件</b>
+                    按钮，在对话框中
+                    <b>直接按下 <code style="color: #ff4d4f">/</code> </b>
+                    打开路径跳转，将下面路径粘贴至输入框中，按
+                    <b>回车键</b> 即可定位到文件，然后点击 <b>打开</b> 按钮即可：
+                </p>
+                <div class="copy-path">
+                    <div class="path" ref="refDivPath">
+                        <code> /etc/hosts </code>
+                    </div>
+                    <a-tooltip title="复制路径">
+                        <a-button :icon="h(CopyOutlined)" size="small" @click="onCopyPath" />
+                    </a-tooltip>
+                </div>
+                <p class="tutorial-image">
+                    <a-image :src="imgMac" />
+                </p>
             </a-collapse-panel>
             <a-collapse-panel key="3" header="Linux / 其他">
                 <p>Linux / 其他</p>
