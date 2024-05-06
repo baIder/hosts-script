@@ -22,26 +22,26 @@ const onOpenFile = async () => {
             store.modalVisible.importModal = false;
         };
         input.click();
-    } else {
-        try {
-            const [fileHandler] = await window.showOpenFilePicker();
-            const text = await (await fileHandler.getFile()).text();
-            store.handleText(text);
-            store.modalVisible.importModal = false;
-        } catch (e) {
-            const { name, message: errMessage } = e as DOMException;
-            switch (name) {
-                case "NotReadableError":
-                    message.error("文件读取失败，请检查权限");
-                    break;
+        return;
+    }
+    try {
+        const [fileHandler] = await window.showOpenFilePicker();
+        const text = await (await fileHandler.getFile()).text();
+        store.handleText(text);
+        store.modalVisible.importModal = false;
+    } catch (e) {
+        const { name, message: errMessage } = e as DOMException;
+        switch (name) {
+            case "NotReadableError":
+                message.error("文件读取失败，请检查权限");
+                break;
 
-                case "AbortError":
-                    break;
+            case "AbortError":
+                break;
 
-                default:
-                    message.error(errMessage);
-                    break;
-            }
+            default:
+                message.error(errMessage);
+                break;
         }
     }
 };
