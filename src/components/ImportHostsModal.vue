@@ -5,6 +5,8 @@ import { message } from "ant-design-vue";
 import { CopyOutlined } from "@ant-design/icons-vue";
 import { useStore } from "@/stores";
 
+import imgWindows from "@/assets/images/windows.gif";
+
 const store = useStore();
 const { currentPlatform } = storeToRefs(store);
 const activeKey = ref<string[]>(["1"]);
@@ -74,13 +76,20 @@ const onCopyPath = async () => {
         <div class="tutorial">在哪里找到 hosts 文件：</div>
         <a-collapse v-model:activeKey="activeKey">
             <a-collapse-panel key="1" header="Windows">
-                <p>点击 选择文件 按钮，将下框中的路径粘贴至打开窗口的路径中，选择打开即可：</p>
+                <p>
+                    点击 <b>选择文件</b> 按钮，将下框中的路径粘贴至打开窗口的路径中，选择打开即可：
+                </p>
                 <div class="copy-path">
-                    <div class="path" ref="refDivPath">%SYSTEMROOT%\System32\drivers\etc\hosts</div>
+                    <div class="path" ref="refDivPath">
+                        <code> %SYSTEMROOT%\System32\drivers\etc\hosts </code>
+                    </div>
                     <a-tooltip title="复制路径">
                         <a-button :icon="h(CopyOutlined)" size="small" @click="onCopyPath" />
                     </a-tooltip>
                 </div>
+                <p class="tutorial-image">
+                    <a-image :src="imgWindows" />
+                </p>
             </a-collapse-panel>
             <a-collapse-panel key="2" header="MacOS">
                 <p>MacOS</p>
@@ -101,6 +110,7 @@ const onCopyPath = async () => {
     justify-content: space-between;
     align-items: center;
     gap: 1em;
+    margin-bottom: 1em;
 
     border: 1px solid #d9d9d9;
     border-radius: 8px;
@@ -122,6 +132,11 @@ const onCopyPath = async () => {
 .tutorial {
     font-weight: bold;
     margin-bottom: 0.5em;
+}
+
+.tutorial-image {
+    border-radius: 8px;
+    overflow: hidden;
 }
 
 .action {
