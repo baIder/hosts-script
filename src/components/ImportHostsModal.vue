@@ -114,7 +114,8 @@ const onCopyPath = async () => {
                 </p>
             </a-collapse-panel>
             <a-collapse-panel key="3" header="Linux / 其他">
-                <p>Linux / 其他</p>
+                如果你使用的是 Linux 或其他系统，请自行查找 hosts
+                文件的位置，也可以将文件拖拽至此页面进行导入。
             </a-collapse-panel>
         </a-collapse>
         <div>
