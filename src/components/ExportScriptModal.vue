@@ -3,6 +3,7 @@ import { storeToRefs } from "pinia";
 import { $genScript } from "@/apis";
 import { useStore } from "@/stores";
 import { genBatScript } from "@/utils/bat-script";
+import { message } from "ant-design-vue";
 
 const store = useStore();
 const { currentPlatform } = storeToRefs(store);
@@ -19,13 +20,19 @@ const onSaveSH = async () => {
         URL.revokeObjectURL(url);
         return;
     }
-    const fileHandle = await window.showSaveFilePicker({
-        suggestedName: "update-hosts.zip",
-        types: [{ accept: { "application/zip": [".zip"] } }]
-    });
-    const writable = await fileHandle.createWritable();
-    await writable.write(file);
-    await writable.close();
+    try {
+        const fileHandle = await window.showSaveFilePicker({
+            suggestedName: "update-hosts.zip",
+            types: [{ accept: { "application/zip": [".zip"] } }]
+        });
+        const writable = await fileHandle.createWritable();
+        await writable.write(file);
+        await writable.close();
+    } catch (error) {
+        const { name, message: errMessage } = error as DOMException;
+        if (name === "AbortError") return;
+        message.error(errMessage);
+    }
 };
 
 const onSaveBat = async () => {
@@ -40,13 +47,19 @@ const onSaveBat = async () => {
         URL.revokeObjectURL(url);
         return;
     }
-    const fileHandle = await window.showSaveFilePicker({
-        suggestedName: "update-hosts.bat",
-        types: [{ accept: { "text/plain": [".bat"] } }]
-    });
-    const writable = await fileHandle.createWritable();
-    await writable.write(script);
-    await writable.close();
+    try {
+        const fileHandle = await window.showSaveFilePicker({
+            suggestedName: "update-hosts.bat",
+            types: [{ accept: { "text/plain": [".bat"] } }]
+        });
+        const writable = await fileHandle.createWritable();
+        await writable.write(script);
+        await writable.close();
+    } catch (error) {
+        const { name, message: errMessage } = error as DOMException;
+        if (name === "AbortError") return;
+        message.error(errMessage);
+    }
 };
 </script>
 

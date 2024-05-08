@@ -5,9 +5,12 @@ import { message } from "ant-design-vue";
 import { CopyOutlined } from "@ant-design/icons-vue";
 import { useStore } from "@/stores";
 
+import imgWindows from "@/assets/images/windows.gif";
+import imgMac from "@/assets/images/mac.gif";
+
 const store = useStore();
 const { currentPlatform } = storeToRefs(store);
-const activeKey = ref<string[]>(["1"]);
+const activeKey = ref<string[]>([]);
 const refDivPath = ref<HTMLDivElement>();
 
 const onOpenFile = async () => {
@@ -22,26 +25,26 @@ const onOpenFile = async () => {
             store.modalVisible.importModal = false;
         };
         input.click();
-    } else {
-        try {
-            const [fileHandler] = await window.showOpenFilePicker();
-            const text = await (await fileHandler.getFile()).text();
-            store.handleText(text);
-            store.modalVisible.importModal = false;
-        } catch (e) {
-            const { name, message: errMessage } = e as DOMException;
-            switch (name) {
-                case "NotReadableError":
-                    message.error("文件读取失败，请检查权限");
-                    break;
+        return;
+    }
+    try {
+        const [fileHandler] = await window.showOpenFilePicker();
+        const text = await (await fileHandler.getFile()).text();
+        store.handleText(text);
+        store.modalVisible.importModal = false;
+    } catch (e) {
+        const { name, message: errMessage } = e as DOMException;
+        switch (name) {
+            case "NotReadableError":
+                message.error("文件读取失败，请检查权限");
+                break;
 
-                case "AbortError":
-                    break;
+            case "AbortError":
+                break;
 
-                default:
-                    message.error(errMessage);
-                    break;
-            }
+            default:
+                message.error(errMessage);
+                break;
         }
     }
 };
@@ -74,19 +77,45 @@ const onCopyPath = async () => {
         <div class="tutorial">在哪里找到 hosts 文件：</div>
         <a-collapse v-model:activeKey="activeKey">
             <a-collapse-panel key="1" header="Windows">
-                <p>点击 选择文件 按钮，将下框中的路径粘贴至打开窗口的路径中，选择打开即可：</p>
+                <p>
+                    点击 <b>选择文件</b> 按钮，将下框中的路径粘贴至打开窗口的路径中，选择打开即可：
+                </p>
                 <div class="copy-path">
-                    <div class="path" ref="refDivPath">%SYSTEMROOT%\System32\drivers\etc\hosts</div>
+                    <div class="path" ref="refDivPath">
+                        <code> %SYSTEMROOT%\System32\drivers\etc\hosts </code>
+                    </div>
                     <a-tooltip title="复制路径">
                         <a-button :icon="h(CopyOutlined)" size="small" @click="onCopyPath" />
                     </a-tooltip>
                 </div>
+                <p class="tutorial-image">
+                    <a-image :src="imgWindows" />
+                </p>
             </a-collapse-panel>
             <a-collapse-panel key="2" header="MacOS">
-                <p>MacOS</p>
+                <p>
+                    点击
+                    <b>选择文件</b>
+                    按钮，在对话框中
+                    <b>直接按下 <code style="color: #ff4d4f">/</code> </b>
+                    打开路径跳转，将下面路径粘贴至输入框中，按
+                    <b>回车键</b> 即可定位到文件，然后点击 <b>打开</b> 按钮即可：
+                </p>
+                <div class="copy-path">
+                    <div class="path" ref="refDivPath">
+                        <code> /etc/hosts </code>
+                    </div>
+                    <a-tooltip title="复制路径">
+                        <a-button :icon="h(CopyOutlined)" size="small" @click="onCopyPath" />
+                    </a-tooltip>
+                </div>
+                <p class="tutorial-image">
+                    <a-image :src="imgMac" />
+                </p>
             </a-collapse-panel>
             <a-collapse-panel key="3" header="Linux / 其他">
-                <p>Linux / 其他</p>
+                如果你使用的是 Linux 或其他系统，请自行查找 hosts
+                文件的位置，也可以将文件拖拽至此页面进行导入。
             </a-collapse-panel>
         </a-collapse>
         <div>
@@ -101,6 +130,7 @@ const onCopyPath = async () => {
     justify-content: space-between;
     align-items: center;
     gap: 1em;
+    margin-bottom: 1em;
 
     border: 1px solid #d9d9d9;
     border-radius: 8px;
@@ -122,6 +152,11 @@ const onCopyPath = async () => {
 .tutorial {
     font-weight: bold;
     margin-bottom: 0.5em;
+}
+
+.tutorial-image {
+    border-radius: 8px;
+    overflow: hidden;
 }
 
 .action {
