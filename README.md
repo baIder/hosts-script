@@ -1,39 +1,33 @@
-# hosts-script
+# 一个可以快速生成 hosts 修改脚本的小工具
 
-This template should help get you started developing with Vue 3 in Vite.
+## 线上演示地址
 
-## Recommended IDE Setup
+<https://hosts.balder.wang/>
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+## 如何开发
 
-## Type Support for `.vue` Imports in TS
+需要在.env中配置环境变量VITE_BASE_URL，用于指定后端接口地址
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
+后端项目仓库地址：<https://github.com/baIder/hosts-script-backend>
 
-## Customize configuration
+```yml
+VITE_BASE_URL=xxx
+```
 
-See [Vite Configuration Reference](https://vitejs.dev/config/).
+### 安装依赖
 
-## Project Setup
-
-```sh
+```bash
 pnpm install
 ```
 
-### Compile and Hot-Reload for Development
+### 开发
 
-```sh
+```bash
 pnpm dev
 ```
 
-### Type-Check, Compile and Minify for Production
+### 打包
 
-```sh
+```bash
 pnpm build
-```
-
-### Lint with [ESLint](https://eslint.org/)
-
-```sh
-pnpm lint
 ```
