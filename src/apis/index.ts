@@ -23,10 +23,11 @@ instance.interceptors.response.use(
     }
 );
 
-export const $genScript = (data: Hosts[]) => {
+export const $genScript = ({ type, data }: { type: "shell" | "bat"; data: Hosts[] }) => {
     return instance.post<File>(
         "/hosts/gen",
         {
+            type,
             data
         },
         {

@@ -2,14 +2,12 @@
 import { storeToRefs } from "pinia";
 import { $genScript } from "@/apis";
 import { useStore } from "@/stores";
-import { genBatScript } from "@/utils/bat-script";
 import { message } from "ant-design-vue";
 
 const store = useStore();
 const { currentPlatform } = storeToRefs(store);
 
-const onSaveSH = async () => {
-    const { data: file } = await $genScript(store.selectedHosts);
+const downloadFile = async (file: File) => {
     if (store.needCompact) {
         const blob = new Blob([file], { type: "application/zip" });
         const url = URL.createObjectURL(blob);
@@ -35,31 +33,14 @@ const onSaveSH = async () => {
     }
 };
 
+const onSaveSH = async () => {
+    const { data: file } = await $genScript({ type: "shell", data: store.selectedHosts });
+    downloadFile(file);
+};
+
 const onSaveBat = async () => {
-    const script = genBatScript(store.selectedHosts);
-    if (store.needCompact) {
-        const blob = new Blob([script], { type: "text/plain" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "update-hosts.bat";
-        a.click();
-        URL.revokeObjectURL(url);
-        return;
-    }
-    try {
-        const fileHandle = await window.showSaveFilePicker({
-            suggestedName: "update-hosts.bat",
-            types: [{ accept: { "text/plain": [".bat"] } }]
-        });
-        const writable = await fileHandle.createWritable();
-        await writable.write(script);
-        await writable.close();
-    } catch (error) {
-        const { name, message: errMessage } = error as DOMException;
-        if (name === "AbortError") return;
-        message.error(errMessage);
-    }
+    const { data: file } = await $genScript({ type: "bat", data: store.selectedHosts });
+    downloadFile(file);
 };
 </script>
 
@@ -69,7 +50,7 @@ const onSaveBat = async () => {
             检测到当前的系统是：
             <span class="platform">{{ currentPlatform }}</span>
             ，推荐下载
-            {{ currentPlatform === "Windows" ? "Windows" : "MacOS / Linux" }}
+            {{ currentPlatform === "Windows" ? "Windows" : "MacOS / Linux / 其他" }}
             平台的脚本。
         </p>
 
@@ -84,7 +65,7 @@ const onSaveBat = async () => {
                 @click="onSaveSH"
                 :type="currentPlatform === 'Windows' ? 'default' : 'primary'"
             >
-                MacOS / Linux 平台
+                MacOS / Linux / 其他 平台
             </a-button>
         </div>
     </a-modal>
