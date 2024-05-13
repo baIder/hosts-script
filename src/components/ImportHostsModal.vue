@@ -18,8 +18,9 @@ const onOpenFile = async () => {
         const input = document.createElement("input");
         input.type = "file";
         input.onchange = async (e) => {
-            const file = (e.target as HTMLInputElement).files?.[0];
-            if (!file) return;
+            const files = (e.target as HTMLInputElement).files;
+            if (!files) return;
+            const file = files[0];
             const text = await file.text();
             store.handleText(text);
             store.modalVisible.importModal = false;
