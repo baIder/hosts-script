@@ -33,14 +33,16 @@ const downloadFile = async (file: File) => {
     }
 };
 
-const onSaveSH = async () => {
-    const { data: file } = await $genScript({ type: "shell", data: store.selectedHosts });
-    downloadFile(file);
+const onSaveSH = () => {
+    $genScript("shell").then((res) => {
+        downloadFile(res.data);
+    });
 };
 
-const onSaveBat = async () => {
-    const { data: file } = await $genScript({ type: "bat", data: store.selectedHosts });
-    downloadFile(file);
+const onSaveBat = () => {
+    $genScript("bat").then((res) => {
+        downloadFile(res.data);
+    });
 };
 </script>
 
