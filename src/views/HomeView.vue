@@ -1,68 +1,54 @@
 <script setup lang="ts">
-import { onMounted } from "vue";
-import { storeToRefs } from "pinia";
-import { useStore } from "@/stores";
-import HostsTable from "@/components/HostsTable.vue";
-import ExportScriptModal from "@/components/ExportScriptModal.vue";
-import ImportHostsModal from "@/components/ImportHostsModal.vue";
-
-const store = useStore();
-const { currentPlatform } = storeToRefs(store);
-
-const openImportModal = () => {
-    store.modalVisible.importModal = true;
-};
-
-const openExportModal = () => {
-    store.modalVisible.exportModal = true;
-};
-
-onMounted(() => {
-    if (window.showSaveFilePicker === undefined) {
-        store.needCompact = true;
-    }
-    if (navigator.userAgent.indexOf("Windows") > -1) {
-        currentPlatform.value = "Windows";
-    } else if (navigator.userAgent.indexOf("Mac") > -1) {
-        currentPlatform.value = "MacOS";
-    } else if (navigator.userAgent.indexOf("Linux") > -1) {
-        currentPlatform.value = "Linux";
-    } else {
-        currentPlatform.value = "其他";
-    }
-});
+import { GithubOutlined, CaretRightOutlined } from "@ant-design/icons-vue";
+import { h } from "vue";
 </script>
 
 <template>
     <div class="wrapper">
-        <header>
-            <a-button @click="openImportModal"> 从hosts文件中导入 </a-button>
-            <a-button @click="openExportModal"> 导出脚本 </a-button>
-        </header>
-        <main>
-            <HostsTable />
-        </main>
+        <div class="content">
+            <div class="title">hosts 脚本生成器</div>
+            <div class="desc">快速生成能修改 hosts 的脚本</div>
+            <div class="buttons">
+                <RouterLink to="/main">
+                    <a-button :icon="h(CaretRightOutlined)" type="primary">开始使用</a-button>
+                </RouterLink>
+                <a-button :icon="h(GithubOutlined)">Github</a-button>
+            </div>
+        </div>
+        <div class="banner">
+            <img src="@/assets/images/banner.jpg" alt="" />
+        </div>
     </div>
-    <ExportScriptModal />
-    <ImportHostsModal />
 </template>
 
 <style scoped lang="scss">
 .wrapper {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-}
+    width: 100vw;
+    height: 100vh;
+    padding: 60px;
 
-header {
-    height: 36px;
-    margin-bottom: 8px;
     display: flex;
     align-items: center;
-    gap: 8px;
-}
 
-main {
-    flex: 1;
+    .content {
+        flex: 1;
+
+        .title {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .desc {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 20px;
+        }
+    }
 }
 </style>
