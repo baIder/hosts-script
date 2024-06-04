@@ -18,10 +18,13 @@ import { h } from "vue";
         <div class="banner">
             <img src="@/assets/images/banner.jpg" alt="" />
         </div>
+        <div class="background"></div>
     </div>
 </template>
 
 <style scoped lang="scss">
+@import '@/assets/css/dynamicBackground.scss';
+
 .wrapper {
     width: 100vw;
     height: 100vh;
@@ -29,6 +32,7 @@ import { h } from "vue";
 
     display: flex;
     align-items: center;
+    overflow: hidden;
 
     .content {
         flex: 1;
