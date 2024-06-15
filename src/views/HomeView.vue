@@ -12,7 +12,9 @@ import { h } from "vue";
                 <RouterLink to="/main">
                     <a-button :icon="h(CaretRightOutlined)" type="primary">开始使用</a-button>
                 </RouterLink>
-                <a-button :icon="h(GithubOutlined)">Github</a-button>
+                <a-button :icon="h(GithubOutlined)" href="https://github.com/baIder/hosts-script"
+                    >Github</a-button
+                >
             </div>
         </div>
         <div class="banner">
@@ -23,7 +25,7 @@ import { h } from "vue";
 </template>
 
 <style scoped lang="scss">
-@import '@/assets/css/dynamicBackground.scss';
+@import "@/assets/css/dynamicBackground.scss";
 
 .wrapper {
     width: 100vw;
